@@ -293,6 +293,7 @@ class DeltaWriter:
 
         try:
             df.write.format("delta").mode(mode).saveAsTable(full_table_name)
+            #df.show()
             logger.info(f"Successfully wrote to {full_table_name}")
         except Exception as e:
             logger.error(f"Failed to write to {full_table_name}: {e}")
@@ -1022,7 +1023,6 @@ class ETLPipeline:
     def __init__(
         self,
         spark: SparkSession,
-        dbutils: Any,
         config: PipelineConfig
     ):
         self.spark = spark
@@ -1110,7 +1110,6 @@ class ETLPipeline:
 
 def main(
     spark: SparkSession,
-    dbutils: Any,
     config: Optional[PipelineConfig] = None,
     target_date: Optional[datetime] = None
 ) -> None:
@@ -1126,20 +1125,15 @@ def main(
     if config is None:
         config = PipelineConfig()
 
-    pipeline = ETLPipeline(spark, dbutils, config)
+    pipeline = ETLPipeline(spark, config)
     pipeline.run(target_date)
 
 
 if __name__ == "__main__":
-    # This block runs when executed as a Databricks notebook
-    import builtins
-
-    dbutils_instance = getattr(builtins, "dbutils", None)
-    spark_instance = getattr(builtins, "spark", None)
-
-    if not dbutils_instance or not spark_instance:
+    spark_instance = SparkSession.builder.appName("WebappWellnessTransformData").getOrCreate()
+    if not spark_instance:
         raise RuntimeError(
-            "This script must run in a Databricks environment with dbutils and spark available"
+            "This script must run in a Databricks environment with spark available"
         )
 
-    main(spark_instance, dbutils_instance)
+    main(spark_instance)
