@@ -357,10 +357,8 @@ class TestDataLoader:
         ]
         mock_cursor.description = [("col1",), ("col2",)]
 
-        mock_connection = Mock()
+        mock_connection = MagicMock()
         mock_connection.cursor.return_value = mock_cursor
-        mock_connection.__enter__.return_value = mock_connection
-        mock_connection.__exit__.return_value = None
 
         mock_connect.return_value = mock_connection
 
@@ -615,7 +613,7 @@ class TestTransformerFactory:
 class TestETLPipeline:
     """Tests for ETLPipeline orchestration class."""
 
-    @patch('notebooks.dataproducts.webapp.ingestion.dbutils')
+    @patch('builtins.dbutils', create=True)
     def test_pipeline_initialization(self, mock_dbutils_global, mock_spark, pipeline_config):
         """Test ETL pipeline initialization."""
         mock_dbutils_global.secrets.get.return_value = "secret"
@@ -627,7 +625,7 @@ class TestETLPipeline:
         assert pipeline.spark == mock_spark
         assert pipeline.config == pipeline_config
 
-    @patch('notebooks.dataproducts.webapp.ingestion.dbutils')
+    @patch('builtins.dbutils', create=True)
     def test_load_secrets(self, mock_dbutils_global, mock_spark, pipeline_config):
         """Test that secrets are loaded during initialization."""
         mock_dbutils_global.secrets.get.return_value = "test_secret"
@@ -640,7 +638,7 @@ class TestETLPipeline:
         assert 'user' in pipeline.secrets
         assert 'jdbc_token' in pipeline.secrets
 
-    @patch('notebooks.dataproducts.webapp.ingestion.dbutils')
+    @patch('builtins.dbutils', create=True)
     def test_run_with_default_date(self, mock_dbutils_global, mock_spark, pipeline_config):
         """Test pipeline run with default date (yesterday)."""
         mock_dbutils_global.secrets.get.return_value = "secret"
@@ -657,7 +655,7 @@ class TestETLPipeline:
         # Verify loader was called
         assert mock_loader.load_for_date.called
 
-    @patch('notebooks.dataproducts.webapp.ingestion.dbutils')
+    @patch('builtins.dbutils', create=True)
     def test_run_with_specific_date(self, mock_dbutils_global, mock_spark, pipeline_config):
         """Test pipeline run with specific date."""
         target_date = datetime(2025, 11, 15)
@@ -737,7 +735,7 @@ class TestMainEntryPoint:
 class TestEndToEndIntegration:
     """End-to-end integration tests."""
 
-    @patch('notebooks.dataproducts.webapp.ingestion.dbutils')
+    @patch('builtins.dbutils', create=True)
     def test_full_pipeline_happy_path(self, mock_dbutils_global, mock_spark, pipeline_config):
         """Test complete pipeline execution happy path."""
         mock_dbutils_global.secrets.get.return_value = "secret"

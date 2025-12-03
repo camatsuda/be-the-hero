@@ -31,9 +31,9 @@ echo ""
 
 # Run pytest with coverage
 echo -e "${GREEN}[2/5] Running tests with coverage...${NC}"
-pytest test_webapp_analytics.py \
+pytest test_ingestion_final.py \
     -v \
-    --cov=webapp_analytics_refactored \
+    --cov=notebooks.dataproducts.webapp.ingestion \
     --cov-report=term-missing \
     --cov-report=html \
     --cov-report=xml:coverage.xml \
@@ -51,7 +51,7 @@ echo ""
 
 # Run pylint
 echo -e "${GREEN}[3/5] Running pylint code analysis...${NC}"
-pylint webapp_analytics_refactored.py \
+pylint notebooks/dataproducts/webapp/ingestion.py \
     --output-format=text \
     --reports=y \
     --score=y \
@@ -63,7 +63,7 @@ echo ""
 
 # Run bandit security check
 echo -e "${GREEN}[4/5] Running bandit security analysis...${NC}"
-bandit -r webapp_analytics_refactored.py \
+bandit -r notebooks/dataproducts/webapp/ingestion.py \
     -f json \
     -o bandit-report.json \
     2>/dev/null || true
